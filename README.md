@@ -1,0 +1,2 @@
+# Eduquery
+Eduquery frontend

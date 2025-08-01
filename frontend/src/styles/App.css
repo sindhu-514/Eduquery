@@ -1,0 +1,276 @@
+/* General Styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f7fa;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header Styles */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #d1eaff;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #223;
+}
+
+.book-select {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 200px;
+  position: relative;
+}
+
+.book-select:focus {
+  outline: none;
+  border-color: #5b9bd5;
+  box-shadow: 0 0 8px rgba(91, 155, 213, 0.3);
+}
+
+.book-select:hover {
+  border-color: #5b9bd5;
+}
+
+.book-select option {
+  padding: 0.8rem;
+  background-color: #fff;
+  border: none;
+  color: #333;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.upload-section {
+  display: flex;
+  align-items: center;
+}
+
+.upload-button {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #45a049;
+}
+
+.upload-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.upload-status {
+  font-size: 0.9rem;
+  color: #333;
+  margin-left: 1rem;
+}
+
+/* Main Content */
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* PDF Panel */
+.pdf-panel {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  background-color: #f9fafc;
+  border-right: 1px solid #ddd;
+  overflow: hidden;
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.pdf-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #777;
+  font-size: 1.2rem;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+/* Chat Panel */
+.chat-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+}
+
+.chat-header {
+  padding: 1rem;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  background-color: #f9fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+}
+
+/* Chat Message Styles */
+.chat-message {
+  margin-bottom: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  max-width: 85%;
+  word-wrap: break-word;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.chat-message.user {
+  background-color: #d1eaff;
+  align-self: flex-end;
+}
+
+.chat-message.bot {
+  background-color: #e7e7e7;
+  align-self: flex-start;
+}
+
+.chat-message.bot.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Chat Message Typography Tweaks */
+.chat-message h1,
+.chat-message h2,
+.chat-message h3,
+.chat-message h4,
+.chat-message h5,
+.chat-message h6 {
+  font-weight: bold;
+  margin: 0.4rem 0 0.2rem;
+  font-size: 1.05rem;
+}
+
+.chat-message p {
+  margin: 0.2rem 0 0.3rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.chat-message ul,
+.chat-message ol {
+  padding-left: 1.2rem;
+  margin: 0.3rem 0;
+}
+
+.chat-message li {
+  margin-bottom: 0.2rem;
+  line-height: 1.4;
+  font-size: 0.94rem;
+}
+
+/* Spinner */
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+}
+
+/* Chat Input */
+.chat-input {
+  display: flex;
+  padding: 0.8rem;
+  border-top: 1px solid #ddd;
+  background-color: #f9fafc;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.chat-input button {
+  margin-left: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  background-color: #5b9bd5;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.chat-input button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Footer */
+.app-footer {
+  background-color: #5f6e8b;
+  color: #d5d0d0;
+  text-align: center;
+  padding: 0.8rem;
+  border-top: 1px solid #ddd;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Spinner Animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,44 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+*.sqlite3
+*.env
+myvenv/
+.env
+
+# === Node / React ===
+node_modules/
+build/
+.env.local
+.env.development
+.env.production
+
+# === VS Code ===
+.vscode/
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Docker ===
+*.pid
+*.tar
+*.log
+
+# === General ===
+*.bak
+*.swp
+*.tmp
+.idea/
+
+# Ignore ChromaDB vector store
+backend/data/chroma_db/
+# Ignore all books
+backend/books/
+# Ignore books in frontend
+frontend/public/books/
+
+
+
