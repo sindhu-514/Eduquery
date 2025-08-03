@@ -41,8 +41,9 @@ backend/chroma_db
 backend/books/
 # Ignore books in frontend
 frontend/public/books/
-llama3.py
-mistral.py
+
+
+
 
 
 
