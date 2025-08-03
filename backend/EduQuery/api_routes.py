@@ -120,6 +120,52 @@ def setup_routes(app, collection):
             logging.error(f"Error processing query: {e}")
             return {"answer": f"Error processing query: {str(e)}", "sources": []}
 
+    @app.post("/query_with_tracking/")
+    async def query_pdf_with_tracking(query: str = Form(...), book_name: str = Form(...), session_id: str = Form(default="default")):
+        """
+        Process query with comprehensive tracking and return detailed JSON response
+        This endpoint provides proof of content retrieval success/failure
+        """
+        try:
+            book_specific_session = f"{session_id}_{book_name}"
+            
+            # Use the new tracking method
+            tracking_data = query_processor.process_query_with_tracking(query, book_name, book_specific_session)
+            
+            # Add the answer to the response for easy access
+            answer = tracking_data["processing_steps"]["final_result"].get("answer", "No response generated")
+            
+            # Create the response
+            response = {
+                "answer": answer,
+                "tracking_data": tracking_data,
+                "summary": {
+                    "content_found": tracking_data["summary"]["content_found"],
+                    "chunks_retrieved": tracking_data["summary"]["chunks_retrieved"],
+                    "response_type": tracking_data["summary"]["response_type"],
+                    "success": tracking_data["summary"]["success"]
+                }
+            }
+            
+            # Add sources if available
+            if tracking_data["processing_steps"]["final_result"].get("content_found"):
+                response["sources"] = [book_name]
+            else:
+                response["sources"] = []
+            
+            return response
+            
+        except Exception as e:
+            logging.error(f"Error processing query with tracking: {e}")
+            return {
+                "answer": f"Error processing query: {str(e)}",
+                "tracking_data": {
+                    "error": str(e),
+                    "success": False
+                },
+                "sources": []
+            }
+
     @app.post("/end_session/")
     async def end_session(session_id: str = Form(...), book_name: str = Form(...)):
         try:

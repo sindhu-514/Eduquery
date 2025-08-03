@@ -9,6 +9,7 @@ import time
 import numpy as np
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
 
 class OllamaEmbedder:
     def __init__(self, model_name=Config.EMBEDDING_MODEL_NAME):
@@ -36,7 +37,7 @@ class OllamaEmbedder:
             
             # Split sample texts into chunks
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
-            documents = [page for page in sample_texts]
+            documents = [Document(page_content=text) for text in sample_texts]
             chunks = text_splitter.split_documents(documents)
             chunk_texts = [chunk.page_content for chunk in chunks]
             

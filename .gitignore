@@ -35,10 +35,15 @@ Thumbs.db
 
 # Ignore ChromaDB vector store
 backend/data/chroma_db/
+backend/cache
+backend/chroma_db
 # Ignore all books
 backend/books/
 # Ignore books in frontend
 frontend/public/books/
+llama3.py
+mistral.py
 
 
 
+ 

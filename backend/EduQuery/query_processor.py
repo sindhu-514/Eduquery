@@ -1,5 +1,7 @@
 import logging
 import os
+import time
+import json
 from EduQuery.embedder import OllamaEmbedder
 from EduQuery.chat_manager import ChatManager
 from EduQuery.llm import GeminiLLM
@@ -178,4 +180,175 @@ Answer:
             return response, query_embedding
         except Exception as e:
             logging.error(f"Error generating response: {e}")
-            return f"Error generating response: {str(e)}", None 
+            return f"Error generating response: {str(e)}", None
+
+    def process_query_with_tracking(self, query: str, book_name: str, session_id: str, n_results: int = 15):
+        """
+        Process query with comprehensive tracking and return detailed JSON response
+        Returns: Complete tracking information as JSON
+        """
+        tracking_data = {
+            "query": query,
+            "book_name": book_name,
+            "session_id": session_id,
+            "timestamp": time.time(),
+            "processing_steps": {
+                "content_retrieval": {},
+                "response_generation": {},
+                "final_result": {}
+            },
+            "summary": {
+                "content_found": False,
+                "chunks_retrieved": 0,
+                "response_type": "unknown",
+                "success": False
+            }
+        }
+        
+        try:
+            # Step 1: Retrieve content with tracking
+            retrieval_info = {
+                "query": query,
+                "book_name": book_name,
+                "n_results_requested": n_results,
+                "content_found": False,
+                "chunks_retrieved": 0,
+                "search_strategy": "semantic_search",
+                "timestamp": time.time(),
+                "error": None
+            }
+            
+            try:
+                LIST_KEYWORDS = ['list', 'all', 'every', 'complete', 'entire', 'phases', 'steps', 'process']
+                query_lower = query.lower()
+                is_list_query = any(keyword in query_lower for keyword in LIST_KEYWORDS)
+                
+                if is_list_query:
+                    retrieval_info["search_strategy"] = "list_query_fallback"
+                    n_results = max(20, n_results)
+                
+                query_embedding = self.embed_query(query)
+                documents, metadatas = self.semantic_search(query_embedding, book_name, n_results)
+                
+                # Track retrieval results
+                retrieval_info["chunks_retrieved"] = len(documents) if documents else 0
+                retrieval_info["content_found"] = len(documents) > 0
+                
+                if not documents:
+                    logging.warning(f"NO CONTENT FOUND for query: '{query}' in book: '{book_name}'")
+                else:
+                    if is_list_query:
+                        all_docs, all_metas = self.handle_list_query_fallback(book_name)
+                        if len(all_docs) > len(documents):
+                            documents = all_docs
+                            metadatas = all_metas
+                            retrieval_info["search_strategy"] = "list_query_fallback"
+                            retrieval_info["chunks_retrieved"] = len(documents)
+                    
+                    # Log successful retrieval
+                    if retrieval_info["content_found"]:
+                        logging.info(f"CONTENT FOUND: Retrieved {len(documents)} chunks for query: '{query}' in book: '{book_name}'")
+                    else:
+                        logging.warning(f"NO CONTENT FOUND: Query: '{query}' in book: '{book_name}'")
+                
+            except Exception as e:
+                retrieval_info["error"] = str(e)
+                logging.error(f"Error retrieving content for query '{query}': {e}")
+                documents, metadatas = [], []
+            
+            tracking_data["processing_steps"]["content_retrieval"] = retrieval_info
+            
+            # Step 2: Prepare retrieved text
+            retrieved_texts = "\n\n".join(documents) if documents else ""
+            
+            # Step 3: Generate response with tracking
+            response_info = {
+                "query": query,
+                "book_name": book_name,
+                "session_id": session_id,
+                "content_found": retrieval_info["content_found"],
+                "chunks_retrieved": retrieval_info["chunks_retrieved"],
+                "response_generated": False,
+                "is_followup": False,
+                "is_new_topic": False,
+                "response_type": "error",
+                "timestamp": time.time(),
+                "error": None
+            }
+            
+            try:
+                query_embedding = self.embed_query(query)
+                is_followup = is_followup_query(query)
+                response_info["is_followup"] = is_followup
+                
+                recent_history = self.chat_manager.get_recent_history(session_id, limit=8)
+                hybrid_history = self.chat_manager.get_hybrid_history(session_id, query_embedding, recent_n=3, relevant_k=2)
+                
+                if is_followup:
+                    pass
+                else:
+                    is_new_topic = is_new_topic_query(query, recent_history) if recent_history else True
+                    response_info["is_new_topic"] = is_new_topic
+                    if is_new_topic:
+                        hybrid_history = []
+                
+                history_text = ""
+                if hybrid_history:
+                    history_text = "\n\n".join([
+                        f"Q: {h['question']}\nA: {h['answer']}" for h in hybrid_history
+                    ])
+                
+                prompt = self.build_strict_prompt(query, retrieved_texts, history_text)
+                response = self.llm.invoke(prompt, query, book_name, retrieved_texts).content
+                
+                # Determine response type
+                if "not present in the provided PDF content" in response.lower():
+                    response_info["response_type"] = "content_not_found"
+                    logging.warning(f"RESPONSE: Content not found for query: '{query}' in book: '{book_name}'")
+                elif response_info["content_found"]:
+                    response_info["response_type"] = "content_found"
+                    logging.info(f"RESPONSE: Content found and answered for query: '{query}' in book: '{book_name}'")
+                else:
+                    response_info["response_type"] = "general_response"
+                
+                response_info["response_generated"] = True
+                
+            except Exception as e:
+                response_info["error"] = str(e)
+                logging.error(f"Error generating response for query '{query}': {e}")
+                response = f"Error generating response: {str(e)}"
+            
+            tracking_data["processing_steps"]["response_generation"] = response_info
+            
+            # Step 4: Prepare final result
+            final_result = {
+                "answer": response,
+                "content_found": retrieval_info["content_found"],
+                "chunks_retrieved": retrieval_info["chunks_retrieved"],
+                "response_type": response_info["response_type"],
+                "search_strategy": retrieval_info["search_strategy"],
+                "is_followup": response_info["is_followup"],
+                "is_new_topic": response_info["is_new_topic"]
+            }
+            
+            tracking_data["processing_steps"]["final_result"] = final_result
+            tracking_data["summary"] = {
+                "content_found": retrieval_info["content_found"],
+                "chunks_retrieved": retrieval_info["chunks_retrieved"],
+                "response_type": response_info["response_type"],
+                "success": True
+            }
+            
+            # Log comprehensive tracking
+            if retrieval_info["content_found"]:
+                logging.info(f"TRACKING SUCCESS: Query '{query}' found content in '{book_name}' - {retrieval_info['chunks_retrieved']} chunks")
+            else:
+                logging.warning(f"TRACKING NO CONTENT: Query '{query}' found NO content in '{book_name}'")
+            
+            return tracking_data
+            
+        except Exception as e:
+            tracking_data["summary"]["success"] = False
+            tracking_data["summary"]["error"] = str(e)
+            logging.error(f"TRACKING ERROR: Failed to process query '{query}': {e}")
+            return tracking_data 

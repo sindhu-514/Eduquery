@@ -21,7 +21,7 @@ function MainApp() {
   }, []);
 
   const fetchBooks = () => {
-    fetch("http://localhost:8006/books/")
+    fetch("http://localhost:8007/books/")
       .then(res => res.json())
       .then(data => setBooks(data.books))
       .catch(err => console.error("Error fetching books:", err));
@@ -43,7 +43,7 @@ function MainApp() {
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:8006/upload/', {
+      const response = await fetch('http://localhost:8007/upload/', {
         method: 'POST',
         body: formData,
       });
@@ -80,7 +80,7 @@ function MainApp() {
     formData.append('session_id', sessionId);
     formData.append('book_name', selectedBook);
 
-    fetch("http://localhost:8006/query/", {
+    fetch("http://localhost:8007/query/", {
       method: 'POST',
       body: formData,
     })
@@ -114,7 +114,7 @@ function MainApp() {
     formData.append('session_id', sessionId);
     formData.append('book_name', selectedBook);
     try {
-      const response = await fetch('http://localhost:8006/end_session/', {
+      const response = await fetch('http://localhost:8007/end_session/', {
         method: 'POST',
         body: formData,
       });
@@ -212,7 +212,7 @@ function MainApp() {
         <div className="pdf-panel">
           {selectedBook ? (
             <iframe
-              src={`http://localhost:8006/book?subject=${selectedBook}`}
+              src={`http://localhost:8007/book?subject=${selectedBook}`}
               className="pdf-viewer"
               title="PDF Viewer"
             />

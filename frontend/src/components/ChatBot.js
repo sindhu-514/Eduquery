@@ -15,7 +15,7 @@ const ChatBot = ({ book }) => {
     form.append("session_id", sessionId);
     form.append("book_name", book);
 
-    const res = await axios.post("http://localhost:8006/query/", form);
+    const res = await axios.post("http://localhost:8007/query/", form);
     const aiReply = res.data.answer;
 
     setChat(prev => [...prev, { user: input, ai: aiReply }]);

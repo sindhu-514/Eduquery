@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:8006';
+const API_BASE = 'http://localhost:8007';
 
 export const fetchBooks = async () => {
   const response = await axios.get(`${API_BASE}/books/`);
