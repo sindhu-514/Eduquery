@@ -5,15 +5,15 @@ EduQuery is a personalized learning platform that helps users interact with educ
 ## 🖥️ Application Screenshots
 
 ### Welcome Screen
-![EduQuery Welcome Screen](./images/home.png)
+![EduQuery Welcome Screen](home%20(1).png)
 *The welcoming interface that introduces users to EduQuery's AI-powered PDF learning capabilities*
 
 ### Main Application Interface
-![EduQuery Main Interface](./images/main.png)
+![EduQuery Main Interface](main%20(1).png)
 *The main application showing the split-screen layout with PDF viewer and chat interface*
 
 ### Active Learning Session
-![EduQuery Active Session](./images/example.png)
+![EduQuery Active Session](example%20(1).png)
 *An active learning session where users can upload PDFs, view content, and ask questions to get AI-powered answers*
 
 ---
